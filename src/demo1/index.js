@@ -26,13 +26,17 @@ import baseVertex from './base.vert'
 import textFragment from './text.frag'
 import persistenceFragment from './persistence.frag'
 
+
+var deadline = new Date("Mar 21, 2023 00:37:25").getTime();
 const MOBILE_BREAKPOINT = 800
 const TYPEKIT_WEB_PROJECT_ID = 'cdp4bcs'
 const DEFAULT_FONT_FAMILY = 'fleisch-wolf'
 const BORDER_PADDING = innerWidth > MOBILE_BREAKPOINT ? 40 : 30
-const START_COLOR = '#362cb7'
+const START_COLOR = '#E5601E'
 const startColorRGB = hexRgb(START_COLOR, { format: 'array' })
 const BACKGROUND_COLOR = '#111'
+var totalTime = 'Coming Soon..'
+
 const PERSIST_COLOR = [
   startColorRGB[0] / 255,
   startColorRGB[1] / 255,
@@ -41,17 +45,35 @@ const PERSIST_COLOR = [
 const TARGET_PERSIST_COLOR = [...PERSIST_COLOR]
 
 const OPTIONS = {
-  text: 'Surreal',
+  text: totalTime,
   noiseFactor: 1,
   noiseScale: 0.0032,
   rgbPersistFactor: 0.98,
-  alphaPersistFactor: 0.97,
+  alphaPersistFactor: 0.87,
   color: '#fff',
   borderColor: MOBILE_BREAKPOINT > 800 ? '#111' : '#222',
   showBorder: true,
-  animateColor: true,
+  animateColor: false,
   fontFamily: DEFAULT_FONT_FAMILY,
 }
+
+
+var x = setInterval(function() {
+var now = new Date().getTime();
+var t = deadline - now;
+var days = Math.floor(t / (1000 * 60 * 60 * 24));
+var hours = Math.floor((t%(1000 * 60 * 60 * 24))/(1000 * 60 * 60));
+var minutes = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
+var seconds = Math.floor((t % (1000 * 60)) / 1000);
+totalTime = days + "d " 
++ hours + "h " + minutes + "m " + seconds + "s ";
+drawText();
+console.log(totalTime);
+    if (t < 0) {
+        clearInterval(x);
+        
+    }
+}, 1000);
 
 const fontFamilies = []
 const mousePos = [0, 0]
@@ -152,7 +174,7 @@ const labelMaterial = new ShaderMaterial({
 const labelMesh = new Mesh(labelGeometry, labelMaterial)
 scene.add(labelMesh)
 
-setGUISettings()
+
 onResize()
 
 setInterval(onColorChange, 3000)
@@ -216,7 +238,8 @@ function onColorChange() {
 }
 
 function drawText({
-  text = OPTIONS.text,
+  
+  text = totalTime,
   fontFamily = OPTIONS.fontFamily,
   horizontalPadding = 0.75,
 } = {}) {
@@ -233,7 +256,7 @@ function drawText({
   texCtx.lineWidth = 1
   texCtx.textAlign = 'center'
   texCtx.textBaseline = 'middle'
-  const referenceFontSize = 250
+  const referenceFontSize = 2000
   texCtx.font = `${referenceFontSize}px ${fontFamily}`
   const textWidth = texCtx.measureText(text).width
   const deltaWidth = (texCanvas.width * horizontalPadding) / textWidth
@@ -251,36 +274,6 @@ function onMouseMove(e) {
   targetMousePos[1] = y
 }
 
-function setGUISettings() {
-  gui.add(OPTIONS, 'text').onChange((text) => {
-    drawText({ text })
-  })
-  gui.add(OPTIONS, 'noiseFactor', 0.1, 50, 0.1).onChange((v) => {
-    fullscreenQuadMaterial.uniforms.noiseFactor.value = v
-  })
-  gui.add(OPTIONS, 'noiseScale', 0.002, 0.01, 0.001).onChange((v) => {
-    fullscreenQuadMaterial.uniforms.noiseScale.value = v
-  })
-  gui.add(OPTIONS, 'rgbPersistFactor', 0.01, 0.99, 0.01).onChange((v) => {
-    fullscreenQuadMaterial.uniforms.rgbPersistFactor.value = v
-  })
-  gui.add(OPTIONS, 'alphaPersistFactor', 0.01, 0.99, 0.01).onChange((v) => {
-    fullscreenQuadMaterial.uniforms.alphaPersistFactor.value = v
-  })
-  gui.add(OPTIONS, 'animateColor')
-  gui.addColor(OPTIONS, 'color').onChange((v) => {
-    const rgba = hexRgb(v, { format: 'array' })
-    PERSIST_COLOR[0] = rgba[0] / 255
-    PERSIST_COLOR[1] = rgba[1] / 255
-    PERSIST_COLOR[2] = rgba[2] / 255
-  })
-  gui.addColor(OPTIONS, 'borderColor').onChange((v) => {
-    fullscreenBorderMaterial.color = new Color(v)
-  })
-  gui.add(OPTIONS, 'showBorder').onChange((v) => {
-    fullscreenBorderMesh.visible = v
-  })
-}
 
 function onResize(resizeCamera = true, resizeFramebuffers = true) {
   renderer.setSize(innerWidth, innerHeight)
@@ -325,6 +318,7 @@ function onFontLoaded(familyName, fvd) {
 
   if (familyName === DEFAULT_FONT_FAMILY) {
     drawText()
+    //console.log(text)
   }
 }
 

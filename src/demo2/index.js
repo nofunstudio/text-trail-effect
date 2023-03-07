@@ -41,7 +41,7 @@ const PERSIST_COLOR = [
 const TARGET_PERSIST_COLOR = [...PERSIST_COLOR]
 
 const OPTIONS = {
-  text: 'play',
+  text: 'update',
   noiseFactor: 1,
   noiseScale: 0.0032,
   rgbPersistFactor: 0.98,
